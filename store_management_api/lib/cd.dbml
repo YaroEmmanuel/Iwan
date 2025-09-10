@@ -1,0 +1,138 @@
+Enum "Permission_actions_enum" {
+  "Ajouter"
+  "Modifier"
+  "Supprimer"
+  "Voir"
+}
+
+Table "Utilisateur" {
+  "id" int [pk, increment]
+  "username" varchar(255)
+  "nom" varchar(255)
+  "prenom" varchar(255)
+  "telephone" varchar(255)
+  "motDePasse" varchar(255)
+  "dateCreation" datetime
+  "actif" boolean
+}
+
+Table "Role" {
+  "id" int [pk, increment]
+  "titre" varchar(255)
+}
+
+Table "Permission" {
+  "id" int [pk, increment]
+  "label" varchar(255)
+  "description" text
+  "actions" Permission_actions_enum
+}
+
+Table "UtilisateurRole" {
+  "id" int [pk, increment]
+  "utilisateur_id" int
+  "role_id" int
+}
+
+Table "RolePermission" {
+  "id" int [pk, increment]
+  "role_id" int
+  "permission_id" int
+}
+
+Table "Produit" {
+  "id" int [pk, increment]
+  "categorie_id" int
+  "codeQr" varchar(255)
+  "titre" varchar(255)
+  "prixUnitaire" decimal
+  "quantiteStock" int
+  "seuilAlerte" int
+  "actif" boolean
+}
+
+Table "Vente" {
+  "id" int [pk, increment]
+  "utilisateur_id" int
+  "numeroTicket" varchar(255)
+  "dateVente" datetime
+  "methodePaiement" MethodePaiement
+  "statut" Statut
+}
+
+Enum "Statut" {
+  Paye
+  Annule
+  Rembourse
+}
+
+Enum "MethodePaiement" {
+  Espece
+  Mobile
+}
+
+Table "LigneVente" {
+  "id" int [pk, increment]
+  "vente_id" int
+  "produit_id" int
+  "quantite" int
+  "prixUnitaire" decimal
+}
+
+Table "Paiement" {
+  "id" int [pk, increment]
+  "vente_id" int
+  "montant" decimal
+  "methodePaiement" varchar(255)
+  "reference" varchar(255)
+  "dateHeure" datetime
+  "statut" varchar(255)
+}
+
+Table "Categorie" {
+  "id" int [pk, increment]
+  "titre" varchar(255)
+}
+
+Table "Stock" {
+  "id" int [pk, increment]
+  "produit_id" int [unique]
+  "quantiteActuelle" int
+  "quantiteReservee" int
+  "derniereMiseAJour" datetime
+}
+
+Table "HistoriqueAction" {
+  "id" int [pk, increment]
+  "utilisateur_id" int
+  "typeAction" varchar(255)
+  "description" text
+  "tableConcernee" varchar(255)
+  "idEnregistrement" int
+  "valeursAvant" text
+  "valeursApres" text
+  "dateHeure" datetime
+  "adresseIP" varchar(255)
+}
+
+Ref:"Utilisateur"."id" < "UtilisateurRole"."utilisateur_id"
+
+Ref:"Role"."id" < "UtilisateurRole"."role_id"
+
+Ref:"Role"."id" < "RolePermission"."role_id"
+
+Ref:"Permission"."id" < "RolePermission"."permission_id"
+
+Ref:"Categorie"."id" < "Produit"."categorie_id"
+
+Ref:"Utilisateur"."id" < "Vente"."utilisateur_id"
+
+Ref:"Vente"."id" < "LigneVente"."vente_id"
+
+Ref:"Produit"."id" < "LigneVente"."produit_id"
+
+Ref:"Vente"."id" < "Paiement"."vente_id"
+
+Ref:"Produit"."id" < "Stock"."produit_id"
+
+Ref:"Utilisateur"."id" < "HistoriqueAction"."utilisateur_id"
